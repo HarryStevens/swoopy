@@ -1,4 +1,4 @@
-  import { angleToDegrees } from "./angleToDegrees";
+import { angleToDegrees } from "./angleToDegrees";
 
 // Calculates the angle of a line, in degrees.
 export function lineAngle(line){
