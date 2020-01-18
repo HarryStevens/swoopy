@@ -1,0 +1,1 @@
+export { quad } from "./src/quad";

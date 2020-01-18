@@ -1,0 +1,45 @@
+{
+  "name": "swoopy",
+  "version": "0.0.1",
+  "description": "Draw swoopy lines.",
+  "main": "build/swoopy.js",
+  "unpkg": "build/swoopy.min.js",
+  "jsdelivr": "build/swoopy.min.js",
+  "module": "index",
+  "scripts": {
+    "pretest": "rm -rf build && mkdir build && rollup -c --banner \"$(preamble)\"",
+    "test": "tape 'test/**/*-test.js'",
+    "prepublish": "npm run test && uglifyjs build/swoopy.js -c -m -o build/swoopy.min.js",
+    "postpublish": "zip -j build/swoopy.zip -- LICENSE README.md build/swoopy.js build/swoopy.min.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "babel": "^6.23.0",
+    "package-preamble": "^0.1.0",
+    "rollup": "^1.29.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "tape": "^4.13.0",
+    "uglify-js": "^3.7.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HarryStevens/swoopy.git"
+  },
+  "keywords": [
+    "bezier",
+    "curves",
+    "swoopy",
+    "lines"
+  ],
+  "author": {
+    "name": "Harry Stevens",
+    "email": "harryjosephstevens@gmail.com",
+    "url": "http://harryjstevens.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HarryStevens/swoopy/issues"
+  },
+  "homepage": "https://github.com/HarryStevens/swoopy#readme"
+}
