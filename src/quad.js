@@ -23,15 +23,14 @@ function quadBezier(a, b, c){
     return [x, y];
   }
 
-  const d = lineLength([a, c]),
-        l = Math.floor(d),
-        p = 1,
+  const l = lineLength([a, c]),
+        n = Math.floor(l),
         o = [];
 
-  for (let j = 0; j < l; j += p){
-    o.push(i(j / l));
+  for (let j = 0; j <= n; j += 1){
+    o.push(i(j / n));
   }
 
-  if (l !== d) o.push(c);
+  if (l !== n) o.push(c);
   return o;
 }
