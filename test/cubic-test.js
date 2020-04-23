@@ -10,7 +10,7 @@ tape("cubic(a, b) returns a cubic Bezier curve from point a to b ", test => {
   test.end()
 });
 
-tape("cubic(a, b, offset) returns accepts offsets", test => {
+tape("cubic(a, b, offset) accepts offsets", test => {
   test.deepEqual(
     round(swoopy.cubic([0, 0], [10, 0], -.5), 3),
     round([[0,0],[1.1440000000000001,-1.0800000000000003],[2.1920000000000006,-1.4400000000000004],[3.1679999999999993,-1.2599999999999996],[4.096,-0.72],[5,0],[5.904,0.72],[6.831999999999999,1.2599999999999998],[7.808000000000002,1.4400000000000002],[8.856,1.0799999999999998],[10,0]], 3)

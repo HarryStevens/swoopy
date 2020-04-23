@@ -10,7 +10,7 @@ tape("quad(a, b) returns a quadratic Bezier curve from point a to b ", test => {
   test.end()
 });
 
-tape("quad(a, b, offset) returns accepts offsets", test => {
+tape("quad(a, b, offset) accepts offsets", test => {
   test.deepEqual(
     round(swoopy.quad([0, 0], [10, 0], -.5), 3),
     round([[0,0],[1.0000000000000002,-0.9000000000000001],[2.0000000000000004,-1.6000000000000003],[3,-2.1],[4,-2.4],[5,-2.5],[6,-2.4],[7,-2.1],[8,-1.5999999999999996],[9.000000000000002,-0.8999999999999998],[10,0]], 3)

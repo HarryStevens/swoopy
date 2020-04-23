@@ -5,6 +5,30 @@
   (global = global || self, factory(global.swoopy = {}));
 }(this, (function (exports) { 'use strict';
 
+  // Calculates the distance between the endpoints of a line segment.
+  function lineLength(line) {
+    return Math.sqrt(Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2));
+  }
+
+  function cubicBezier(a, b, c, d, p) {
+    var i = function i(t) {
+      var x = Math.pow(1 - t, 3) * a[0] + 3 * t * Math.pow(1 - t, 2) * b[0] + 3 * Math.pow(t, 2) * (1 - t) * c[0] + Math.pow(t, 3) * d[0];
+      var y = Math.pow(1 - t, 3) * a[1] + 3 * t * Math.pow(1 - t, 2) * b[1] + 3 * Math.pow(t, 2) * (1 - t) * c[1] + Math.pow(t, 3) * d[1];
+      return [x, y];
+    };
+
+    var l = lineLength([a, d]),
+        n = Math.floor(l),
+        o = [];
+
+    for (var j = 0; j <= n; j += 1) {
+      o.push(i(j / n));
+    }
+
+    if (l !== n) o.push(d);
+    return o;
+  }
+
   // Converts radians to degrees.
   function angleToDegrees(angle) {
     return angle * 180 / Math.PI;
@@ -12,11 +36,6 @@
 
   function lineAngle(line) {
     return angleToDegrees(Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]));
-  }
-
-  // Calculates the distance between the endpoints of a line segment.
-  function lineLength(line) {
-    return Math.sqrt(Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2));
   }
 
   // Converts degrees to radians.
@@ -50,25 +69,6 @@
         c = pointTranslate(m0, g + 90, len * offset),
         d = pointTranslate(m1, g - 90, len * offset);
     return cubicBezier(a, c, d, b);
-  } // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
-
-  function cubicBezier(a, b, c, d, p) {
-    var i = function i(t) {
-      var x = Math.pow(1 - t, 3) * a[0] + 3 * t * Math.pow(1 - t, 2) * b[0] + 3 * Math.pow(t, 2) * (1 - t) * c[0] + Math.pow(t, 3) * d[0];
-      var y = Math.pow(1 - t, 3) * a[1] + 3 * t * Math.pow(1 - t, 2) * b[1] + 3 * Math.pow(t, 2) * (1 - t) * c[1] + Math.pow(t, 3) * d[1];
-      return [x, y];
-    };
-
-    var l = lineLength([a, d]),
-        n = Math.floor(l),
-        o = [];
-
-    for (var j = 0; j <= n; j += 1) {
-      o.push(i(j / n));
-    }
-
-    if (l !== n) o.push(d);
-    return o;
   }
 
   // Calculates the midpoint of a line segment.
