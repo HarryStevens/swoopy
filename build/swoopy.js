@@ -5,10 +5,91 @@
   (global = global || self, factory(global.swoopy = {}));
 }(this, (function (exports) { 'use strict';
 
+  function _slicedToArray(arr, i) {
+    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  }
+
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    }
+  }
+
+  function _arrayWithHoles(arr) {
+    if (Array.isArray(arr)) return arr;
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _iterableToArrayLimit(arr, i) {
+    if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
+      return;
+    }
+
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"] != null) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
+  function _nonIterableRest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  }
+
   // Calculates the distance between the endpoints of a line segment.
   function lineLength(line) {
     return Math.sqrt(Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2));
   }
+
+  function quadBezier(a, b, c) {
+    var i = function i(t) {
+      var x = Math.pow(1 - t, 2) * a[0] + 2 * t * (1 - t) * b[0] + Math.pow(t, 2) * c[0];
+      var y = Math.pow(1 - t, 2) * a[1] + 2 * t * (1 - t) * b[1] + Math.pow(t, 2) * c[1];
+      return [x, y];
+    };
+
+    var l = lineLength([a, c]),
+        n = Math.floor(l),
+        o = [];
+
+    for (var j = 0; j <= n; j += 1) {
+      o.push(i(j / n));
+    }
+
+    if (l !== n) o.push(c);
+    return o;
+  } // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
 
   function cubicBezier(a, b, c, d, p) {
     var i = function i(t) {
@@ -58,6 +139,29 @@
     };
   }
 
+  function scale(domain, range, value) {
+    return range[0] + (range[1] - range[0]) * Math.abs(value - domain[0]) / Math.max.apply(Math, _toConsumableArray(domain)) - Math.min.apply(Math, _toConsumableArray(domain));
+  }
+
+  function arc(a, b, offset) {
+    offset = offset === 0 ? 0 : offset || 1;
+
+    var o = scale([0, 1.08], [.5, 0], Math.abs(offset)),
+        s = offset < 0 ? -1 : 1,
+        d = scale([0, 1], [0, .667], Math.abs(offset)) * s,
+        ang = lineAngle([a, b]),
+        len = lineLength([a, b]),
+        _int = lineInterpolate([a, b]),
+        _map = [_int(o), _int(1 - o)].map(function (p) {
+      return pointTranslate(p, ang + 90, len * d);
+    }),
+        _map2 = _slicedToArray(_map, 2),
+        p0 = _map2[0],
+        p1 = _map2[1];
+
+    return cubicBezier(a, p0, p1, b);
+  }
+
   function cubic(a, b, offset) {
     offset = offset === 0 ? 0 : offset || .5;
     var l = [a, b],
@@ -84,27 +188,9 @@
         g = lineAngle(l),
         c = pointTranslate(m, g + 90, d * offset);
     return quadBezier(a, c, b);
-  } // See https://math.stackexchange.com/a/1361717/659913
-
-  function quadBezier(a, b, c) {
-    var i = function i(t) {
-      var x = Math.pow(1 - t, 2) * a[0] + 2 * t * (1 - t) * b[0] + Math.pow(t, 2) * c[0];
-      var y = Math.pow(1 - t, 2) * a[1] + 2 * t * (1 - t) * b[1] + Math.pow(t, 2) * c[1];
-      return [x, y];
-    };
-
-    var l = lineLength([a, c]),
-        n = Math.floor(l),
-        o = [];
-
-    for (var j = 0; j <= n; j += 1) {
-      o.push(i(j / n));
-    }
-
-    if (l !== n) o.push(c);
-    return o;
   }
 
+  exports.arc = arc;
   exports.cubic = cubic;
   exports.quad = quad;
 
