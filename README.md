@@ -1,13 +1,13 @@
 # swoopy
-Draw swoopy lines from one point to another. [![Build Status](https://travis-ci.org/HarryStevens/swoopy.svg?branch=master)](https://travis-ci.org/HarryStevens/swoopy)
+Draw swoopy lines from one point to another.
 
 ## Installation
 
 ### Web browser
 In vanilla, a `swoopy` global is exported. You can use the latest version from unpkg.
 ```html
-<script src="https://unpkg.com/swoopy@0.0.4/build/swoopy.js"></script>
-<script src="https://unpkg.com/swoopy@0.0.4/build/swoopy.min.js"></script>
+<script src="https://unpkg.com/swoopy@0.0.5/build/swoopy.js"></script>
+<script src="https://unpkg.com/swoopy@0.0.5/build/swoopy.min.js"></script>
 ```
 If you'd rather host it yourself, download the latest release from the [`build` directory](https://github.com/HarryStevens/swoopy/tree/master/build).
 
