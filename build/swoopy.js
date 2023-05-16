@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.6. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.7. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
