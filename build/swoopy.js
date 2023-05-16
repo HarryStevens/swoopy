@@ -1,9 +1,15 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.6. Copyright 2021 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.6. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = global || self, factory(global.swoopy = {}));
 }(this, (function (exports) { 'use strict';
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
   function _slicedToArray(arr, i) {
     return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
@@ -82,6 +88,73 @@
     return Math.sqrt(Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2));
   }
 
+  // Calculates the midpoint of a line segment.
+  function lineMidpoint(line) {
+    return [(line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2];
+  }
+
+  var Node = function Node(value, point) {
+    var next = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+    _classCallCheck(this, Node);
+
+    this.value = value; // t value
+
+    this.point = point; // corresponding interpolator(t)
+
+    this.next = next;
+  }; // Recursive subdivision using perpendicular distance threshold
+
+
+  function recursiveSubdivision(interpolator) {
+    var precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.1;
+    var maxIters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1e3;
+    var start = new Node(0, interpolator(0));
+    var mid = new Node(0.5, interpolator(0.5));
+    var end = new Node(1, interpolator(1));
+    start.next = mid;
+    mid.next = end;
+    var iters = 0;
+
+    while (iters < maxIters) {
+      var any = false;
+      var _current = start;
+
+      while (_current && _current.next) {
+        var t = 0.5 * (_current.value + _current.next.value);
+        var p = interpolator(t);
+
+        if (lineLength([p, lineMidpoint([_current.point, _current.next.point])]) > precision) {
+          // Insert the new point
+          any = true;
+          var newPoint = new Node(t, p, _current.next);
+          _current.next = newPoint;
+          _current = newPoint.next; // Skip the next pair since we've already checked it
+        } else {
+          _current = _current.next; // Move to the next pair
+        }
+      } // If there are no more lengths exceeding the threshold, end the algorithm
+
+
+      if (!any) {
+        break;
+      } else {
+        iters++;
+      }
+    } // Collect the points into an array
+
+
+    var points = [];
+    var current = start;
+
+    while (current) {
+      points.push(current.point);
+      current = current.next;
+    }
+
+    return points;
+  }
+
   function quadBezier(a, b, c) {
     var i = function i(t) {
       var x = Math.pow(1 - t, 2) * a[0] + 2 * t * (1 - t) * b[0] + Math.pow(t, 2) * c[0];
@@ -89,16 +162,7 @@
       return [x, y];
     };
 
-    var l = lineLength([a, c]),
-        n = Math.floor(l),
-        o = [];
-
-    for (var j = 0; j <= n; j++) {
-      o.push(i(j / n));
-    }
-
-    if (l !== n) o.push(c);
-    return o;
+    return recursiveSubdivision(i);
   } // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
 
   function cubicBezier(a, b, c, d) {
@@ -108,16 +172,7 @@
       return [x, y];
     };
 
-    var l = lineLength([a, d]),
-        n = Math.floor(l),
-        o = [];
-
-    for (var j = 0; j <= n; j++) {
-      o.push(i(j / n));
-    }
-
-    if (l !== n) o.push(d);
-    return o;
+    return recursiveSubdivision(i);
   }
 
   // Converts radians to degrees.
@@ -183,11 +238,6 @@
         c = pointTranslate(m0, g + 90, len * offset),
         d = pointTranslate(m1, g - 90, len * offset);
     return cubicBezier(a, c, d, b);
-  }
-
-  // Calculates the midpoint of a line segment.
-  function lineMidpoint(line) {
-    return [(line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2];
   }
 
   function quad(a, b, offset) {

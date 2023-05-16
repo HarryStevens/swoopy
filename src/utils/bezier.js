@@ -1,4 +1,4 @@
-import { lineLength } from "./lineLength";
+import { recursiveSubdivision } from "./recursiveSubdivision";
 
 // See https://math.stackexchange.com/a/1361717/659913
 export function quadBezier(a, b, c){
@@ -8,16 +8,7 @@ export function quadBezier(a, b, c){
     return [x, y];
   }
 
-  const l = lineLength([a, c]),
-        n = Math.floor(l),
-        o = [];
-
-  for (let j = 0; j <= n; j++){
-    o.push(i(j / n));
-  }
-
-  if (l !== n) o.push(c);
-  return o;
+  return recursiveSubdivision(i);
 }
 
 // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
@@ -28,14 +19,5 @@ export function cubicBezier(a, b, c, d){
     return [x, y];
   }
 
-  const l = lineLength([a, d]),
-        n = Math.floor(l),
-        o = [];
-
-  for (let j = 0; j <= n; j++){
-    o.push(i(j / n));
-  }
-
-  if (l !== n) o.push(d);
-  return o;
+  return recursiveSubdivision(i);
 }
