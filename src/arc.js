@@ -48,7 +48,7 @@ export function arc(a, b, offset = 1){
   const s = scale([-1, 1], [-r, r], offset);
   const mid = lineMidpoint([a, b]);
   const theta = lineAngle([a, b]);
-  const m = pointTranslate(mid, theta - 90, s);
+  const m = pointTranslate(mid, theta + 90, s);
   const i = interpolateArc(a, m, b);
   return sample(i);
 }

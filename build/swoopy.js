@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.7. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.8. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -174,6 +174,10 @@
     return rx * ((value - d0) / dx) + r0;
   }
 
+  // For the original implementation, see:
+  // https://observablehq.com/@jrus/circle-arc-interpolation
+  // https://observablehq.com/@jrus/complex
+
   function cdiv(z0, z1) {
     return cmul(z0, cinv(z1));
   }
@@ -239,7 +243,7 @@
     var s = scale([-1, 1], [-r, r], offset);
     var mid = lineMidpoint([a, b]);
     var theta = lineAngle([a, b]);
-    var m = pointTranslate(mid, theta - 90, s);
+    var m = pointTranslate(mid, theta + 90, s);
     var i = interpolateArc(a, m, b);
     return sample(i);
   }
