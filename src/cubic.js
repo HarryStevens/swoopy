@@ -4,9 +4,7 @@ import { lineInterpolate } from "./utils/lineInterpolate";
 import { lineLength } from "./utils/lineLength";
 import { pointTranslate } from "./utils/pointTranslate";
 
-export function cubic(a, b, offset){
-  offset = offset === 0 ? 0 : offset || .5;
-
+export function cubic(a, b, offset = 0.5){
   const l = [a, b],
         len = lineLength(l),
         i = lineInterpolate(l),

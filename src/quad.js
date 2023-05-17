@@ -4,9 +4,7 @@ import { lineMidpoint } from "./utils/lineMidpoint";
 import { pointTranslate } from "./utils/pointTranslate";
 import { quadBezier } from "./utils/bezier";
 
-export function quad(a, b, offset){
-  offset = offset === 0 ? 0 : offset || .5;
-  
+export function quad(a, b, offset = 0.5){
   const l = [a, b],
         d = lineLength(l),
         m = lineMidpoint(l),

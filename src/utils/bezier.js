@@ -1,4 +1,4 @@
-import { recursiveSubdivision } from "./recursiveSubdivision";
+import { sample } from "./sample";
 
 // See https://math.stackexchange.com/a/1361717/659913
 export function quadBezier(a, b, c){
@@ -8,7 +8,7 @@ export function quadBezier(a, b, c){
     return [x, y];
   }
 
-  return recursiveSubdivision(i);
+  return sample(i);
 }
 
 // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
@@ -19,5 +19,5 @@ export function cubicBezier(a, b, c, d){
     return [x, y];
   }
 
-  return recursiveSubdivision(i);
+  return sample(i);
 }

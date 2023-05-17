@@ -15,20 +15,8 @@
     return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
   }
 
-  function _toConsumableArray(arr) {
-    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
-  }
-
-  function _arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
-  }
-
   function _arrayWithHoles(arr) {
     if (Array.isArray(arr)) return arr;
-  }
-
-  function _iterableToArray(iter) {
-    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
   }
 
   function _iterableToArrayLimit(arr, i) {
@@ -75,12 +63,17 @@
     return arr2;
   }
 
-  function _nonIterableSpread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  // Converts radians to degrees.
+  function angleToDegrees(angle) {
+    return angle * 180 / Math.PI;
+  }
+
+  function lineAngle(line) {
+    return angleToDegrees(Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]));
   }
 
   // Calculates the distance between the endpoints of a line segment.
@@ -91,6 +84,16 @@
   // Calculates the midpoint of a line segment.
   function lineMidpoint(line) {
     return [(line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2];
+  }
+
+  // Converts degrees to radians.
+  function angleToRadians(angle) {
+    return angle / 180 * Math.PI;
+  }
+
+  function pointTranslate(point, angle, distance) {
+    var r = angleToRadians(angle);
+    return [point[0] + distance * Math.cos(r), point[1] + distance * Math.sin(r)];
   }
 
   var Node = function Node(value, point) {
@@ -106,7 +109,7 @@
   }; // Recursive subdivision using perpendicular distance threshold
 
 
-  function recursiveSubdivision(interpolator) {
+  function sample(interpolator) {
     var precision = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.1;
     var maxIters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1e3;
     var start = new Node(0, interpolator(0));
@@ -155,6 +158,92 @@
     return points;
   }
 
+  // A linear scale
+  function scale(domain, range, value) {
+    var _domain = _slicedToArray(domain, 2),
+        d0 = _domain[0],
+        d1 = _domain[1];
+
+    var dx = d1 - d0;
+
+    var _range = _slicedToArray(range, 2),
+        r0 = _range[0],
+        r1 = _range[1];
+
+    var rx = r1 - r0;
+    return rx * ((value - d0) / dx) + r0;
+  }
+
+  function cdiv(z0, z1) {
+    return cmul(z0, cinv(z1));
+  }
+
+  function cinv(_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        x = _ref2[0],
+        y = _ref2[1];
+
+    var s = 1 / (x * x + y * y);
+    return [s * x, -s * y];
+  }
+
+  function clerp(_ref3, _ref4, t) {
+    var _ref5 = _slicedToArray(_ref3, 2),
+        x0 = _ref5[0],
+        y0 = _ref5[1];
+
+    var _ref6 = _slicedToArray(_ref4, 2),
+        x1 = _ref6[0],
+        y1 = _ref6[1];
+
+    return [x0 * (1 - t) + x1 * t, y0 * (1 - t) + y1 * t];
+  }
+
+  function cmul(_ref7, _ref8) {
+    var _ref9 = _slicedToArray(_ref7, 2),
+        x0 = _ref9[0],
+        y0 = _ref9[1];
+
+    var _ref10 = _slicedToArray(_ref8, 2),
+        x1 = _ref10[0],
+        y1 = _ref10[1];
+
+    return [x0 * x1 - y0 * y1, x0 * y1 + y0 * x1];
+  }
+
+  function csub(_ref11, _ref12) {
+    var _ref13 = _slicedToArray(_ref11, 2),
+        x0 = _ref13[0],
+        y0 = _ref13[1];
+
+    var _ref14 = _slicedToArray(_ref12, 2),
+        x1 = _ref14[0],
+        y1 = _ref14[1];
+
+    return [x0 - x1, y0 - y1];
+  }
+
+  function interpolateArc(a, m, b) {
+    var b_m = csub(b, m);
+    var m_a = csub(m, a);
+    var ab_m = cmul(a, b_m);
+    var bm_a = cmul(b, m_a);
+    return function (t) {
+      return cdiv(clerp(ab_m, bm_a, t), clerp(b_m, m_a, t));
+    };
+  }
+
+  function arc(a, b) {
+    var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+    var r = lineLength([a, b]) / 2;
+    var s = scale([-1, 1], [-r, r], offset);
+    var mid = lineMidpoint([a, b]);
+    var theta = lineAngle([a, b]);
+    var m = pointTranslate(mid, theta - 90, s);
+    var i = interpolateArc(a, m, b);
+    return sample(i);
+  }
+
   function quadBezier(a, b, c) {
     var i = function i(t) {
       var x = Math.pow(1 - t, 2) * a[0] + 2 * t * (1 - t) * b[0] + Math.pow(t, 2) * c[0];
@@ -162,7 +251,7 @@
       return [x, y];
     };
 
-    return recursiveSubdivision(i);
+    return sample(i);
   } // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
 
   function cubicBezier(a, b, c, d) {
@@ -172,26 +261,7 @@
       return [x, y];
     };
 
-    return recursiveSubdivision(i);
-  }
-
-  // Converts radians to degrees.
-  function angleToDegrees(angle) {
-    return angle * 180 / Math.PI;
-  }
-
-  function lineAngle(line) {
-    return angleToDegrees(Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]));
-  }
-
-  // Converts degrees to radians.
-  function angleToRadians(angle) {
-    return angle / 180 * Math.PI;
-  }
-
-  function pointTranslate(point, angle, distance) {
-    var r = angleToRadians(angle);
-    return [point[0] + distance * Math.cos(r), point[1] + distance * Math.sin(r)];
+    return sample(i);
   }
 
   // The returned interpolator function takes a single argument t, where t is a number ranging from 0 to 1;
@@ -204,31 +274,8 @@
     };
   }
 
-  function scale(domain, range, value) {
-    return range[0] + (range[1] - range[0]) * Math.abs(value - domain[0]) / Math.max.apply(Math, _toConsumableArray(domain)) - Math.min.apply(Math, _toConsumableArray(domain));
-  }
-
-  function arc(a, b, offset) {
-    offset = offset === 0 ? 0 : offset || 1;
-
-    var o = scale([0, 1.08], [.5, 0], Math.abs(offset)),
-        s = offset < 0 ? -1 : 1,
-        d = scale([0, 1], [0, .667], Math.abs(offset)) * s,
-        ang = lineAngle([a, b]),
-        len = lineLength([a, b]),
-        _int = lineInterpolate([a, b]),
-        _map = [_int(o), _int(1 - o)].map(function (p) {
-      return pointTranslate(p, ang + 90, len * d);
-    }),
-        _map2 = _slicedToArray(_map, 2),
-        p0 = _map2[0],
-        p1 = _map2[1];
-
-    return cubicBezier(a, p0, p1, b);
-  }
-
-  function cubic(a, b, offset) {
-    offset = offset === 0 ? 0 : offset || .5;
+  function cubic(a, b) {
+    var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var l = [a, b],
         len = lineLength(l),
         i = lineInterpolate(l),
@@ -240,8 +287,8 @@
     return cubicBezier(a, c, d, b);
   }
 
-  function quad(a, b, offset) {
-    offset = offset === 0 ? 0 : offset || .5;
+  function quad(a, b) {
+    var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
     var l = [a, b],
         d = lineLength(l),
         m = lineMidpoint(l),

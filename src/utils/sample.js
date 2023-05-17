@@ -10,7 +10,7 @@ class Node {
 }
 
 // Recursive subdivision using perpendicular distance threshold
-export function recursiveSubdivision(interpolator, precision = 0.1, maxIters = 1e3){
+export function sample(interpolator, precision = 0.1, maxIters = 1e3){
   let start = new Node(0, interpolator(0));
   let mid = new Node(0.5, interpolator(0.5));
   let end = new Node(1, interpolator(1));
