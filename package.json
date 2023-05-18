@@ -1,6 +1,6 @@
 {
   "name": "swoopy",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Draw swoopy lines.",
   "main": "build/swoopy.js",
   "unpkg": "build/swoopy.min.js",
