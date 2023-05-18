@@ -1,7 +1,5 @@
-import { lineAngle } from "./utils/lineAngle";
-import { lineLength } from "./utils/lineLength";
-import { lineMidpoint } from "./utils/lineMidpoint";
-import { pointTranslate } from "./utils/pointTranslate";
+import { cdiv, clerp, cmul, csub } from "./utils/complex";
+import { lineAngle, lineLength, lineMidpoint, pointTranslate } from "./utils/geometry";
 import { sample } from "./utils/sample";
 import { scale } from "./utils/scale";
 
@@ -9,32 +7,6 @@ import { scale } from "./utils/scale";
 // For the original implementation, see:
 // https://observablehq.com/@jrus/circle-arc-interpolation
 // https://observablehq.com/@jrus/complex
-
-// Divides two complex numbers
-function cdiv(z0, z1) {
-  return cmul(z0, cinv(z1));
-}
-
-// Calculates the multiplicative inverse (or reciprocal) of a complex number
-function cinv([x, y]) {
-  const s = 1 / (x * x + y * y);
-  return [s * x, -s * y];
-}
-
-// Linearly interpolates between two complex numbers
-function clerp([x0, y0], [x1, y1], t) {
-  return [x0 * (1 - t) + x1 * t, y0 * (1 - t) + y1 * t];
-}
-
-// Multiplies two complex numbers
-function cmul([x0, y0], [x1, y1]) {
-  return [x0 * x1 - y0 * y1, x0 * y1 + y0 * x1];
-}
-
-// Subtracts one complex number from another
-function csub([x0, y0], [x1, y1]) {
-  return [x0 - x1, y0 - y1];
-}
 
 function interpolateArc(a, m, b){
   // Calculate two vectors: b_m and m_a,
@@ -59,22 +31,16 @@ function interpolateArc(a, m, b){
   );
 }
 
-// Returns an array of points representing a circular arc
-// running between point a and point b,
-// both of which must be passed as an array of two numbers
-// representing the x- and y-coordinates of the points. 
-// You may pass an optional offse representing how round you want your arc to be.
-// If an offset is not specified, it defaults to 1, which will return the points of a semicircle.
-// An offset of 0 returns the points of a straight line segment.
 export function arc(a, b, offset = 1){
-  const r = lineLength([a, b]) / 2;
+  const l = [a, b];
+  const r = lineLength(l) / 2;
 
   return sample(
     interpolateArc(
       a,
       pointTranslate(
-        lineMidpoint([a, b]),
-        lineAngle([a, b]) + 90,
+        lineMidpoint(l),
+        lineAngle(l) + 90,
         scale([-1, 1], [-r, r], offset)
       ),
       b

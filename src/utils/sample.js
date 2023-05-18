@@ -1,5 +1,4 @@
-import { lineLength } from "./lineLength";
-import { lineMidpoint } from "./lineMidpoint";
+import { lineLength, lineMidpoint } from "./geometry";
 
 // Node for linked list
 class Node {

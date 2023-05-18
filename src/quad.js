@@ -1,8 +1,5 @@
-import { lineAngle } from "./utils/lineAngle";
-import { lineLength } from "./utils/lineLength";
-import { lineMidpoint } from "./utils/lineMidpoint";
+import { lineAngle, lineLength, lineMidpoint, pointTranslate } from "./utils/geometry";
 import { pow } from "./utils/math";
-import { pointTranslate } from "./utils/pointTranslate";
 import { sample } from "./utils/sample";
 
 // See https://math.stackexchange.com/a/1361717/659913
@@ -15,13 +12,15 @@ function interpolateQuad(a, b, c){
 }
 
 export function quad(a, b, offset = 0.5){
+  const l = [a, b];
+
   return sample(
     interpolateQuad(
       a,
       pointTranslate(
-        lineMidpoint([a, b]),
-        lineAngle([a, b]) + 90,
-        lineLength([a, b]) * offset
+        lineMidpoint(l),
+        lineAngle(l) + 90,
+        lineLength(l) * offset
       ),
       b
     )

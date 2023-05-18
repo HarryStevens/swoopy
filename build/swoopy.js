@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.9. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.10. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -67,9 +67,56 @@
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
-  // Converts radians to degrees.
-  function angleToDegrees(angle) {
-    return angle * 180 / Math.PI;
+  // See https://observablehq.com/@jrus/complex
+  // Calculates the multiplicative inverse (or reciprocal) of a complex number
+  function cinv(_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        x = _ref2[0],
+        y = _ref2[1];
+
+    var s = 1 / (x * x + y * y);
+    return [s * x, -s * y];
+  } // Divides two complex numbers
+
+
+  function cdiv(z0, z1) {
+    return cmul(z0, cinv(z1));
+  } // Linearly interpolates between two complex numbers
+
+  function clerp(_ref3, _ref4, t) {
+    var _ref5 = _slicedToArray(_ref3, 2),
+        x0 = _ref5[0],
+        y0 = _ref5[1];
+
+    var _ref6 = _slicedToArray(_ref4, 2),
+        x1 = _ref6[0],
+        y1 = _ref6[1];
+
+    return [x0 * (1 - t) + x1 * t, y0 * (1 - t) + y1 * t];
+  } // Multiplies two complex numbers
+
+  function cmul(_ref7, _ref8) {
+    var _ref9 = _slicedToArray(_ref7, 2),
+        x0 = _ref9[0],
+        y0 = _ref9[1];
+
+    var _ref10 = _slicedToArray(_ref8, 2),
+        x1 = _ref10[0],
+        y1 = _ref10[1];
+
+    return [x0 * x1 - y0 * y1, x0 * y1 + y0 * x1];
+  } // Subtracts one complex number from another
+
+  function csub(_ref11, _ref12) {
+    var _ref13 = _slicedToArray(_ref11, 2),
+        x0 = _ref13[0],
+        y0 = _ref13[1];
+
+    var _ref14 = _slicedToArray(_ref12, 2),
+        x1 = _ref14[0],
+        y1 = _ref14[1];
+
+    return [x0 - x1, y0 - y1];
   }
 
   function atan2(y, x) {
@@ -82,23 +129,36 @@
     return Math.sqrt(x);
   }
 
+  function angleToDegrees(angle) {
+    return angle * 180 / Math.PI;
+  } // Converts degrees to radians.
+
+
+  function angleToRadians(angle) {
+    return angle / 180 * Math.PI;
+  } // Calculates the angle of a line, in degrees.
+
+
   function lineAngle(line) {
     return angleToDegrees(atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]));
-  }
+  } // Returns an interpolator function given a line [a, b].
+  // The returned interpolator function takes a single argument t, where t is a number ranging from 0 to 1;
+  // a value of 0 returns a, while a value of 1 returns b.
+  // Intermediate values interpolate from start to end along the line segment.
+
+  function lineInterpolate(line) {
+    return function (t) {
+      return t === 0 ? line[0] : t === 1 ? line[1] : pointTranslate(line[0], lineAngle(line), lineLength(line) * t);
+    };
+  } // Calculates the distance between the endpoints of a line segment.
 
   function lineLength(line) {
     return sqrt(pow(line[1][0] - line[0][0], 2) + pow(line[1][1] - line[0][1], 2));
-  }
+  } // Calculates the midpoint of a line segment.
 
-  // Calculates the midpoint of a line segment.
   function lineMidpoint(line) {
     return [(line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2];
-  }
-
-  // Converts degrees to radians.
-  function angleToRadians(angle) {
-    return angle / 180 * Math.PI;
-  }
+  } // Translates a point by an angle in degrees and distance.
 
   function pointTranslate(point, angle, distance) {
     var r = angleToRadians(angle);
@@ -189,60 +249,6 @@
   // For the original implementation, see:
   // https://observablehq.com/@jrus/circle-arc-interpolation
   // https://observablehq.com/@jrus/complex
-  // Divides two complex numbers
-
-  function cdiv(z0, z1) {
-    return cmul(z0, cinv(z1));
-  } // Calculates the multiplicative inverse (or reciprocal) of a complex number
-
-
-  function cinv(_ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
-        x = _ref2[0],
-        y = _ref2[1];
-
-    var s = 1 / (x * x + y * y);
-    return [s * x, -s * y];
-  } // Linearly interpolates between two complex numbers
-
-
-  function clerp(_ref3, _ref4, t) {
-    var _ref5 = _slicedToArray(_ref3, 2),
-        x0 = _ref5[0],
-        y0 = _ref5[1];
-
-    var _ref6 = _slicedToArray(_ref4, 2),
-        x1 = _ref6[0],
-        y1 = _ref6[1];
-
-    return [x0 * (1 - t) + x1 * t, y0 * (1 - t) + y1 * t];
-  } // Multiplies two complex numbers
-
-
-  function cmul(_ref7, _ref8) {
-    var _ref9 = _slicedToArray(_ref7, 2),
-        x0 = _ref9[0],
-        y0 = _ref9[1];
-
-    var _ref10 = _slicedToArray(_ref8, 2),
-        x1 = _ref10[0],
-        y1 = _ref10[1];
-
-    return [x0 * x1 - y0 * y1, x0 * y1 + y0 * x1];
-  } // Subtracts one complex number from another
-
-
-  function csub(_ref11, _ref12) {
-    var _ref13 = _slicedToArray(_ref11, 2),
-        x0 = _ref13[0],
-        y0 = _ref13[1];
-
-    var _ref14 = _slicedToArray(_ref12, 2),
-        x1 = _ref14[0],
-        y1 = _ref14[1];
-
-    return [x0 - x1, y0 - y1];
-  }
 
   function interpolateArc(a, m, b) {
     // Calculate two vectors: b_m and m_a,
@@ -262,29 +268,13 @@
     return function (t) {
       return cdiv(clerp(ab_m, bm_a, t), clerp(b_m, m_a, t));
     };
-  } // Returns an array of points representing a circular arc
-  // running between point a and point b,
-  // both of which must be passed as an array of two numbers
-  // representing the x- and y-coordinates of the points. 
-  // You may pass an optional offse representing how round you want your arc to be.
-  // If an offset is not specified, it defaults to 1, which will return the points of a semicircle.
-  // An offset of 0 returns the points of a straight line segment.
-
+  }
 
   function arc(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    var r = lineLength([a, b]) / 2;
-    return sample(interpolateArc(a, pointTranslate(lineMidpoint([a, b]), lineAngle([a, b]) + 90, scale([-1, 1], [-r, r], offset)), b));
-  }
-
-  // The returned interpolator function takes a single argument t, where t is a number ranging from 0 to 1;
-  // a value of 0 returns a, while a value of 1 returns b.
-  // Intermediate values interpolate from start to end along the line segment.
-
-  function lineInterpolate(line) {
-    return function (t) {
-      return t === 0 ? line[0] : t === 1 ? line[1] : pointTranslate(line[0], lineAngle(line), lineLength(line) * t);
-    };
+    var l = [a, b];
+    var r = lineLength(l) / 2;
+    return sample(interpolateArc(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, scale([-1, 1], [-r, r], offset)), b));
   }
 
   function interpolateCubic(a, b, c, d) {
@@ -297,9 +287,10 @@
 
   function cubic(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
-    var d = lineLength([a, b]);
-    var i = lineInterpolate([a, b]);
-    var theta = lineAngle([a, b]);
+    var l = [a, b];
+    var d = lineLength(l);
+    var i = lineInterpolate(l);
+    var theta = lineAngle(l);
     return sample(interpolateCubic(a, pointTranslate(i(.4), theta + 90, d * offset), pointTranslate(i(.6), theta - 90, d * offset), b));
   }
 
@@ -313,7 +304,8 @@
 
   function quad(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
-    return sample(interpolateQuad(a, pointTranslate(lineMidpoint([a, b]), lineAngle([a, b]) + 90, lineLength([a, b]) * offset), b));
+    var l = [a, b];
+    return sample(interpolateQuad(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) * offset), b));
   }
 
   exports.arc = arc;

@@ -6,8 +6,8 @@ Draw swoopy lines from one point to another.
 ### Web browser
 In vanilla, a `swoopy` global is exported. You can use the latest version from unpkg.
 ```html
-<script src="https://unpkg.com/swoopy@0.0.10/build/swoopy.js"></script>
-<script src="https://unpkg.com/swoopy@0.0.10/build/swoopy.min.js"></script>
+<script src="https://unpkg.com/swoopy@0.0.11/build/swoopy.js"></script>
+<script src="https://unpkg.com/swoopy@0.0.11/build/swoopy.min.js"></script>
 ```
 If you'd rather host it yourself, download the latest release from the [`build` directory](https://github.com/HarryStevens/swoopy/tree/master/build).
 

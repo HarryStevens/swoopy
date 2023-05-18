@@ -1,8 +1,5 @@
-import { lineAngle } from "./utils/lineAngle";
-import { lineInterpolate } from "./utils/lineInterpolate";
-import { lineLength } from "./utils/lineLength";
+import { lineAngle, lineInterpolate, lineLength, pointTranslate } from "./utils/geometry";
 import { pow } from "./utils/math";
-import { pointTranslate } from "./utils/pointTranslate";
 import { sample } from "./utils/sample";
 
 // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
@@ -15,9 +12,10 @@ function interpolateCubic(a, b, c, d){
 }
 
 export function cubic(a, b, offset = 0.5){
-  const d = lineLength([a, b]);
-  const i = lineInterpolate([a, b]);
-  const theta = lineAngle([a, b]);
+  const l = [a, b];
+  const d = lineLength(l);
+  const i = lineInterpolate(l);
+  const theta = lineAngle(l);
 
   return sample(
     interpolateCubic(
