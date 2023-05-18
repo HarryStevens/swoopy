@@ -5,7 +5,7 @@ import { pointTranslate } from "./utils/pointTranslate";
 import { sample } from "./utils/sample";
 import { scale } from "./utils/scale";
 
-// Much of this code was adapted from Jacon Rus
+// Much of this code was adapted from Jacob Rus
 // For the original implementation, see:
 // https://observablehq.com/@jrus/circle-arc-interpolation
 // https://observablehq.com/@jrus/complex
