@@ -1,13 +1,13 @@
-import { atan2, pow, sqrt } from "./math";
+import { atan2, cos, pi, pow, sin, sqrt } from "./math";
 
 // Converts radians to degrees.
 function angleToDegrees(angle){
-  return angle * 180 / Math.PI;
+  return angle * 180 / pi;
 }
 
 // Converts degrees to radians.
 function angleToRadians(angle){
-  return angle / 180 * Math.PI;
+  return angle / 180 * pi;
 }
 
 // Calculates the angle of a line, in degrees.
@@ -36,5 +36,5 @@ export function lineMidpoint(line){
 // Translates a point by an angle in degrees and distance.
 export function pointTranslate(point, angle, distance){
   const r = angleToRadians(angle);
-  return [point[0] + distance * Math.cos(r), point[1] + distance * Math.sin(r)];
+  return [point[0] + distance * cos(r), point[1] + distance * sin(r)];
 }

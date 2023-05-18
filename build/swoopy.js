@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.10. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.11. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -122,20 +122,27 @@
   function atan2(y, x) {
     return Math.atan2(y, x);
   }
+  function cos(x) {
+    return Math.cos(x);
+  }
   function pow(x, y) {
     return Math.pow(x, y);
+  }
+  function sin(x) {
+    return Math.sin(x);
   }
   function sqrt(x) {
     return Math.sqrt(x);
   }
+  var pi = Math.PI;
 
   function angleToDegrees(angle) {
-    return angle * 180 / Math.PI;
+    return angle * 180 / pi;
   } // Converts degrees to radians.
 
 
   function angleToRadians(angle) {
-    return angle / 180 * Math.PI;
+    return angle / 180 * pi;
   } // Calculates the angle of a line, in degrees.
 
 
@@ -162,7 +169,7 @@
 
   function pointTranslate(point, angle, distance) {
     var r = angleToRadians(angle);
-    return [point[0] + distance * Math.cos(r), point[1] + distance * Math.sin(r)];
+    return [point[0] + distance * cos(r), point[1] + distance * sin(r)];
   }
 
   var Node = function Node(value, point) {
@@ -245,10 +252,6 @@
     var rx = r1 - r0;
     return rx * ((value - d0) / dx) + r0;
   }
-
-  // For the original implementation, see:
-  // https://observablehq.com/@jrus/circle-arc-interpolation
-  // https://observablehq.com/@jrus/complex
 
   function interpolateArc(a, m, b) {
     // Calculate two vectors: b_m and m_a,
