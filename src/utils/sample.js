@@ -1,6 +1,7 @@
 import { lineLength } from "./lineLength";
 import { lineMidpoint } from "./lineMidpoint";
 
+// Node for linked list
 class Node {
   constructor(value, point, next = null) {
     this.value = value; // t value
@@ -9,7 +10,11 @@ class Node {
   }
 }
 
-// Recursive subdivision using perpendicular distance threshold
+// Recursive subdivision using perpendicular distance threshold:
+// An adaptive sampling strategy to discretize a path interpolator,
+// ensuring that the sampled points are always within the given precision from the actual path.
+// It does this by adding more points in the regions of the path where the curvature is higher
+// and fewer points where it's lower, thus achieving an efficient and accurate sampling.
 export function sample(interpolator, precision = 0.1, maxIters = 1e3){
   let start = new Node(0, interpolator(0));
   let mid = new Node(0.5, interpolator(0.5));
