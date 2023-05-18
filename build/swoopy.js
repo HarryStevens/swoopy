@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.8. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.9. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -72,13 +72,22 @@
     return angle * 180 / Math.PI;
   }
 
-  function lineAngle(line) {
-    return angleToDegrees(Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]));
+  function atan2(y, x) {
+    return Math.atan2(y, x);
+  }
+  function pow(x, y) {
+    return Math.pow(x, y);
+  }
+  function sqrt(x) {
+    return Math.sqrt(x);
   }
 
-  // Calculates the distance between the endpoints of a line segment.
+  function lineAngle(line) {
+    return angleToDegrees(atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]));
+  }
+
   function lineLength(line) {
-    return Math.sqrt(Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2));
+    return sqrt(pow(line[1][0] - line[0][0], 2) + pow(line[1][1] - line[0][1], 2));
   }
 
   // Calculates the midpoint of a line segment.
@@ -106,7 +115,11 @@
     this.point = point; // corresponding interpolator(t)
 
     this.next = next;
-  }; // Recursive subdivision using perpendicular distance threshold
+  }; // Recursive subdivision using perpendicular distance threshold:
+  // An adaptive sampling strategy to discretize a path interpolator,
+  // ensuring that the sampled points are always within the given precision from the actual path.
+  // It does this by adding more points in the regions of the path where the curvature is higher
+  // and fewer points where it's lower, thus achieving an efficient and accurate sampling.
 
 
   function sample(interpolator) {
@@ -159,17 +172,16 @@
   }
 
   // A linear scale
-  function scale(domain, range, value) {
-    var _domain = _slicedToArray(domain, 2),
-        d0 = _domain[0],
-        d1 = _domain[1];
+  function scale(_ref, _ref2, value) {
+    var _ref3 = _slicedToArray(_ref, 2),
+        d0 = _ref3[0],
+        d1 = _ref3[1];
+
+    var _ref4 = _slicedToArray(_ref2, 2),
+        r0 = _ref4[0],
+        r1 = _ref4[1];
 
     var dx = d1 - d0;
-
-    var _range = _slicedToArray(range, 2),
-        r0 = _range[0],
-        r1 = _range[1];
-
     var rx = r1 - r0;
     return rx * ((value - d0) / dx) + r0;
   }
@@ -177,10 +189,12 @@
   // For the original implementation, see:
   // https://observablehq.com/@jrus/circle-arc-interpolation
   // https://observablehq.com/@jrus/complex
+  // Divides two complex numbers
 
   function cdiv(z0, z1) {
     return cmul(z0, cinv(z1));
-  }
+  } // Calculates the multiplicative inverse (or reciprocal) of a complex number
+
 
   function cinv(_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
@@ -189,7 +203,8 @@
 
     var s = 1 / (x * x + y * y);
     return [s * x, -s * y];
-  }
+  } // Linearly interpolates between two complex numbers
+
 
   function clerp(_ref3, _ref4, t) {
     var _ref5 = _slicedToArray(_ref3, 2),
@@ -201,7 +216,8 @@
         y1 = _ref6[1];
 
     return [x0 * (1 - t) + x1 * t, y0 * (1 - t) + y1 * t];
-  }
+  } // Multiplies two complex numbers
+
 
   function cmul(_ref7, _ref8) {
     var _ref9 = _slicedToArray(_ref7, 2),
@@ -213,7 +229,8 @@
         y1 = _ref10[1];
 
     return [x0 * x1 - y0 * y1, x0 * y1 + y0 * x1];
-  }
+  } // Subtracts one complex number from another
+
 
   function csub(_ref11, _ref12) {
     var _ref13 = _slicedToArray(_ref11, 2),
@@ -228,44 +245,36 @@
   }
 
   function interpolateArc(a, m, b) {
+    // Calculate two vectors: b_m and m_a,
+    // which are the vectors from the midpoint to the end point
+    // and from the start point to the midpoint, respectively
     var b_m = csub(b, m);
-    var m_a = csub(m, a);
+    var m_a = csub(m, a); // Calculate two more values: ab_m and bm_a.
+    // The first is the complex multiplication of the start point and b_m,
+    // and the second is the complex multiplication of the end point and m_a
+
     var ab_m = cmul(a, b_m);
-    var bm_a = cmul(b, m_a);
+    var bm_a = cmul(b, m_a); // Perform a linear interpolation between ab_m and bm_a and between b_m and m_a,
+    // and divide the first result by the second.
+    // This results in a point on the circular arc between a and b
+    // that corresponds to the input parameter t.
+
     return function (t) {
       return cdiv(clerp(ab_m, bm_a, t), clerp(b_m, m_a, t));
     };
-  }
+  } // Returns an array of points representing a circular arc
+  // running between point a and point b,
+  // both of which must be passed as an array of two numbers
+  // representing the x- and y-coordinates of the points. 
+  // You may pass an optional offse representing how round you want your arc to be.
+  // If an offset is not specified, it defaults to 1, which will return the points of a semicircle.
+  // An offset of 0 returns the points of a straight line segment.
+
 
   function arc(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
     var r = lineLength([a, b]) / 2;
-    var s = scale([-1, 1], [-r, r], offset);
-    var mid = lineMidpoint([a, b]);
-    var theta = lineAngle([a, b]);
-    var m = pointTranslate(mid, theta + 90, s);
-    var i = interpolateArc(a, m, b);
-    return sample(i);
-  }
-
-  function quadBezier(a, b, c) {
-    var i = function i(t) {
-      var x = Math.pow(1 - t, 2) * a[0] + 2 * t * (1 - t) * b[0] + Math.pow(t, 2) * c[0];
-      var y = Math.pow(1 - t, 2) * a[1] + 2 * t * (1 - t) * b[1] + Math.pow(t, 2) * c[1];
-      return [x, y];
-    };
-
-    return sample(i);
-  } // See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
-
-  function cubicBezier(a, b, c, d) {
-    var i = function i(t) {
-      var x = Math.pow(1 - t, 3) * a[0] + 3 * t * Math.pow(1 - t, 2) * b[0] + 3 * Math.pow(t, 2) * (1 - t) * c[0] + Math.pow(t, 3) * d[0];
-      var y = Math.pow(1 - t, 3) * a[1] + 3 * t * Math.pow(1 - t, 2) * b[1] + 3 * Math.pow(t, 2) * (1 - t) * c[1] + Math.pow(t, 3) * d[1];
-      return [x, y];
-    };
-
-    return sample(i);
+    return sample(interpolateArc(a, pointTranslate(lineMidpoint([a, b]), lineAngle([a, b]) + 90, scale([-1, 1], [-r, r], offset)), b));
   }
 
   // The returned interpolator function takes a single argument t, where t is a number ranging from 0 to 1;
@@ -278,27 +287,33 @@
     };
   }
 
+  function interpolateCubic(a, b, c, d) {
+    return function (t) {
+      var x = pow(1 - t, 3) * a[0] + 3 * t * pow(1 - t, 2) * b[0] + 3 * pow(t, 2) * (1 - t) * c[0] + pow(t, 3) * d[0];
+      var y = pow(1 - t, 3) * a[1] + 3 * t * pow(1 - t, 2) * b[1] + 3 * pow(t, 2) * (1 - t) * c[1] + pow(t, 3) * d[1];
+      return [x, y];
+    };
+  }
+
   function cubic(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
-    var l = [a, b],
-        len = lineLength(l),
-        i = lineInterpolate(l),
-        m0 = i(.4),
-        m1 = i(.6),
-        g = lineAngle(l),
-        c = pointTranslate(m0, g + 90, len * offset),
-        d = pointTranslate(m1, g - 90, len * offset);
-    return cubicBezier(a, c, d, b);
+    var d = lineLength([a, b]);
+    var i = lineInterpolate([a, b]);
+    var theta = lineAngle([a, b]);
+    return sample(interpolateCubic(a, pointTranslate(i(.4), theta + 90, d * offset), pointTranslate(i(.6), theta - 90, d * offset), b));
+  }
+
+  function interpolateQuad(a, b, c) {
+    return function (t) {
+      var x = pow(1 - t, 2) * a[0] + 2 * t * (1 - t) * b[0] + pow(t, 2) * c[0];
+      var y = pow(1 - t, 2) * a[1] + 2 * t * (1 - t) * b[1] + pow(t, 2) * c[1];
+      return [x, y];
+    };
   }
 
   function quad(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
-    var l = [a, b],
-        d = lineLength(l),
-        m = lineMidpoint(l),
-        g = lineAngle(l),
-        c = pointTranslate(m, g + 90, d * offset);
-    return quadBezier(a, c, b);
+    return sample(interpolateQuad(a, pointTranslate(lineMidpoint([a, b]), lineAngle([a, b]) + 90, lineLength([a, b]) * offset), b));
   }
 
   exports.arc = arc;

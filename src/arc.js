@@ -59,12 +59,25 @@ function interpolateArc(a, m, b){
   );
 }
 
+// Returns an array of points representing a circular arc
+// running between point a and point b,
+// both of which must be passed as an array of two numbers
+// representing the x- and y-coordinates of the points. 
+// You may pass an optional offse representing how round you want your arc to be.
+// If an offset is not specified, it defaults to 1, which will return the points of a semicircle.
+// An offset of 0 returns the points of a straight line segment.
 export function arc(a, b, offset = 1){
   const r = lineLength([a, b]) / 2;
-  const s = scale([-1, 1], [-r, r], offset);
-  const mid = lineMidpoint([a, b]);
-  const theta = lineAngle([a, b]);
-  const m = pointTranslate(mid, theta + 90, s);
-  const i = interpolateArc(a, m, b);
-  return sample(i);
+
+  return sample(
+    interpolateArc(
+      a,
+      pointTranslate(
+        lineMidpoint([a, b]),
+        lineAngle([a, b]) + 90,
+        scale([-1, 1], [-r, r], offset)
+      ),
+      b
+    )
+  );
 }

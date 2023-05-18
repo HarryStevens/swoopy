@@ -1,18 +1,30 @@
-import { cubicBezier } from "./utils/bezier";
 import { lineAngle } from "./utils/lineAngle";
 import { lineInterpolate } from "./utils/lineInterpolate";
 import { lineLength } from "./utils/lineLength";
+import { pow } from "./utils/math";
 import { pointTranslate } from "./utils/pointTranslate";
+import { sample } from "./utils/sample";
+
+// See https://math.stackexchange.com/questions/26846/is-there-an-explicit-form-for-cubic-b%C3%A9zier-curves
+function interpolateCubic(a, b, c, d){
+  return t => {
+    const x = pow((1 - t), 3) * a[0] + 3 * t * pow((1 - t), 2) * b[0] + 3 * pow(t, 2) * (1 - t) * c[0] + pow(t, 3) * d[0];
+    const y = pow((1 - t), 3) * a[1] + 3 * t * pow((1 - t), 2) * b[1] + 3 * pow(t, 2) * (1 - t) * c[1] + pow(t, 3) * d[1];
+    return [x, y];
+  }
+}
 
 export function cubic(a, b, offset = 0.5){
-  const l = [a, b],
-        len = lineLength(l),
-        i = lineInterpolate(l),
-        m0 = i(.4),
-        m1 = i(.6),
-        g = lineAngle(l),
-        c = pointTranslate(m0, g + 90, len * offset),
-        d = pointTranslate(m1, g - 90, len * offset);
+  const d = lineLength([a, b]);
+  const i = lineInterpolate([a, b]);
+  const theta = lineAngle([a, b]);
 
-  return cubicBezier(a, c, d, b);
+  return sample(
+    interpolateCubic(
+      a,
+      pointTranslate(i(.4), theta + 90, d * offset),
+      pointTranslate(i(.6), theta - 90, d * offset),
+      b
+    )
+  );
 }
