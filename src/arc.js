@@ -3,11 +3,7 @@ import { lineAngle, lineLength, lineMidpoint, pointTranslate } from "./utils/geo
 import { sample } from "./utils/sample";
 import { scale } from "./utils/scale";
 
-// Much of this code was adapted from Jacob Rus
-// For the original implementation, see:
-// https://observablehq.com/@jrus/circle-arc-interpolation
-// https://observablehq.com/@jrus/complex
-
+// See https://observablehq.com/@jrus/circle-arc-interpolation
 function interpolateArc(a, m, b){
   // Calculate two vectors: b_m and m_a,
   // which are the vectors from the midpoint to the end point
