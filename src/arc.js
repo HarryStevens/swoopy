@@ -1,7 +1,6 @@
 import { cdiv, clerp, cmul, csub } from "./utils/complex";
 import { lineAngle, lineLength, lineMidpoint, pointTranslate } from "./utils/geometry";
 import { sample } from "./utils/sample";
-import { scale } from "./utils/scale";
 
 // See https://observablehq.com/@jrus/circle-arc-interpolation
 function interpolateArc(a, m, b){
@@ -37,7 +36,7 @@ export function arc(a, b, offset = 1){
       pointTranslate(
         lineMidpoint(l),
         lineAngle(l) + 90,
-        scale([-1, 1], [-r, r], offset)
+        lineLength(l) / 2 * offset
       ),
       b
     )

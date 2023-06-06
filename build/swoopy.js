@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.11. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.12. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -238,21 +238,6 @@
     return points;
   }
 
-  // A linear scale
-  function scale(_ref, _ref2, value) {
-    var _ref3 = _slicedToArray(_ref, 2),
-        d0 = _ref3[0],
-        d1 = _ref3[1];
-
-    var _ref4 = _slicedToArray(_ref2, 2),
-        r0 = _ref4[0],
-        r1 = _ref4[1];
-
-    var dx = d1 - d0;
-    var rx = r1 - r0;
-    return rx * ((value - d0) / dx) + r0;
-  }
-
   function interpolateArc(a, m, b) {
     // Calculate two vectors: b_m and m_a,
     // which are the vectors from the midpoint to the end point
@@ -277,7 +262,7 @@
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
     var l = [a, b];
     var r = lineLength(l) / 2;
-    return sample(interpolateArc(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, scale([-1, 1], [-r, r], offset)), b));
+    return sample(interpolateArc(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) / 2 * offset), b));
   }
 
   function interpolateCubic(a, b, c, d) {
