@@ -15,9 +15,9 @@ class Node {
 // It does this by adding more points in the regions of the path where the curvature is higher
 // and fewer points where it's lower, thus achieving an efficient and accurate sampling.
 export function sample(interpolator, precision = 0.1, maxIters = 1e3){
-  let start = new Node(0, interpolator(0));
-  let mid = new Node(0.5, interpolator(0.5));
-  let end = new Node(1, interpolator(1));
+  const start = new Node(0, interpolator(0));
+  const mid = new Node(0.5, interpolator(0.5));
+  const end = new Node(1, interpolator(1));
   start.next = mid;
   mid.next = end;
 
@@ -33,7 +33,7 @@ export function sample(interpolator, precision = 0.1, maxIters = 1e3){
       if (lineLength([ p, lineMidpoint([current.point, current.next.point]) ]) > precision) {
         // Insert the new point
         any = true;
-        let newPoint = new Node(t, p, current.next);
+        const newPoint = new Node(t, p, current.next);
         current.next = newPoint;
         current = newPoint.next;  // Skip the next pair since we've already checked it
       } else {
@@ -50,7 +50,7 @@ export function sample(interpolator, precision = 0.1, maxIters = 1e3){
   }
 
   // Collect the points into an array
-  let points = [];
+  const points = [];
   let current = start;
   while (current) {
     points.push(current.point);
