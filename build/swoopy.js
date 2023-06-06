@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.12. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.14. Copyright 2023 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -154,8 +154,24 @@
   // Intermediate values interpolate from start to end along the line segment.
 
   function lineInterpolate(line) {
+    var _line = _slicedToArray(line, 2),
+        _line$ = _slicedToArray(_line[0], 2),
+        x1 = _line$[0],
+        y1 = _line$[1],
+        _line$2 = _slicedToArray(_line[1], 2),
+        x2 = _line$2[0],
+        y2 = _line$2[1];
+
+    var x = function x(v) {
+      return (x2 - x1) * v + x1;
+    };
+
+    var y = function y(v) {
+      return (y2 - y1) * v + y1;
+    };
+
     return function (t) {
-      return t === 0 ? line[0] : t === 1 ? line[1] : pointTranslate(line[0], lineAngle(line), lineLength(line) * t);
+      return [x(t), y(t)];
     };
   } // Calculates the distance between the endpoints of a line segment.
 
@@ -261,7 +277,6 @@
   function arc(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
     var l = [a, b];
-    var r = lineLength(l) / 2;
     return sample(interpolateArc(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) / 2 * offset), b));
   }
 
