@@ -20,7 +20,12 @@ export function lineAngle(line){
 // a value of 0 returns a, while a value of 1 returns b.
 // Intermediate values interpolate from start to end along the line segment.
 export function lineInterpolate(line){
-  return t => t === 0 ? line[0] : t === 1 ? line[1] : pointTranslate(line[0], lineAngle(line), lineLength(line) * t);
+  const [[x1, y1], [x2, y2]] = line;
+  const x = v => (x2 - x1) * v + x1;
+  const y = v => (y2 - y1) * v + y1;
+  return t => {
+    return [x(t), y(t)];
+  }
 }
 
 // Calculates the distance between the endpoints of a line segment.
