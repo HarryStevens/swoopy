@@ -28,7 +28,6 @@ function interpolateArc(a, m, b){
 
 export function arc(a, b, offset = 1){
   const l = [a, b];
-  const r = lineLength(l) / 2;
 
   return sample(
     interpolateArc(
