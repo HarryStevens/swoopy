@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swoopy#readme Version 0.0.14. Copyright 2023 Harry Stevens.
+// https://github.com/HarryStevens/swoopy#readme Version 0.0.15. Copyright 2024 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -276,8 +276,9 @@
 
   function arc(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+    var precision = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.1;
     var l = [a, b];
-    return sample(interpolateArc(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) / 2 * offset), b));
+    return sample(interpolateArc(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) / 2 * offset), b), precision);
   }
 
   function interpolateCubic(a, b, c, d) {
@@ -290,11 +291,12 @@
 
   function cubic(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
+    var precision = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.1;
     var l = [a, b];
     var d = lineLength(l);
     var i = lineInterpolate(l);
     var theta = lineAngle(l);
-    return sample(interpolateCubic(a, pointTranslate(i(.4), theta + 90, d * offset), pointTranslate(i(.6), theta - 90, d * offset), b));
+    return sample(interpolateCubic(a, pointTranslate(i(.4), theta + 90, d * offset), pointTranslate(i(.6), theta - 90, d * offset), b), precision);
   }
 
   function interpolateQuad(a, b, c) {
@@ -307,8 +309,9 @@
 
   function quad(a, b) {
     var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.5;
+    var precision = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.1;
     var l = [a, b];
-    return sample(interpolateQuad(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) * offset), b));
+    return sample(interpolateQuad(a, pointTranslate(lineMidpoint(l), lineAngle(l) + 90, lineLength(l) * offset), b), precision);
   }
 
   exports.arc = arc;

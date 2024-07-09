@@ -26,7 +26,7 @@ function interpolateArc(a, m, b){
   );
 }
 
-export function arc(a, b, offset = 1){
+export function arc(a, b, offset = 1, precision = 0.1){
   const l = [a, b];
 
   return sample(
@@ -38,6 +38,7 @@ export function arc(a, b, offset = 1){
         lineLength(l) / 2 * offset
       ),
       b
-    )
+    ),
+    precision
   );
 }

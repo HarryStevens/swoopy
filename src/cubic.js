@@ -11,7 +11,7 @@ function interpolateCubic(a, b, c, d){
   }
 }
 
-export function cubic(a, b, offset = 0.5){
+export function cubic(a, b, offset = 0.5, precision = 0.1){
   const l = [a, b];
   const d = lineLength(l);
   const i = lineInterpolate(l);
@@ -23,6 +23,7 @@ export function cubic(a, b, offset = 0.5){
       pointTranslate(i(.4), theta + 90, d * offset),
       pointTranslate(i(.6), theta - 90, d * offset),
       b
-    )
+    ),
+    precision
   );
 }

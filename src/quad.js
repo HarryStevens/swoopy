@@ -11,7 +11,7 @@ function interpolateQuad(a, b, c){
   }
 }
 
-export function quad(a, b, offset = 0.5){
+export function quad(a, b, offset = 0.5, precision = 0.1){
   const l = [a, b];
 
   return sample(
@@ -23,6 +23,7 @@ export function quad(a, b, offset = 0.5){
         lineLength(l) * offset
       ),
       b
-    )
+    ),
+    precision
   );
 }
