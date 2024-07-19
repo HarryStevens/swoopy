@@ -2,6 +2,23 @@ import { cdiv, clerp, cmul, csub } from "./utils/complex";
 import { lineAngle, lineLength, lineMidpoint, pointTranslate } from "./utils/geometry";
 import { sample } from "./utils/sample";
 
+export function arc(a, b, offset = 1, precision = 0.1){
+  const l = [a, b];
+
+  return sample(
+    interpolateArc(
+      a,
+      pointTranslate(
+        lineMidpoint(l),
+        lineAngle(l) + 90,
+        lineLength(l) / 2 * offset
+      ),
+      b
+    ),
+    precision
+  );
+}
+
 // See https://observablehq.com/@jrus/circle-arc-interpolation
 function interpolateArc(a, m, b){
   // Calculate two vectors: b_m and m_a,
@@ -23,22 +40,5 @@ function interpolateArc(a, m, b){
   return t => cdiv(
     clerp(ab_m, bm_a, t),
     clerp(b_m, m_a, t)
-  );
-}
-
-export function arc(a, b, offset = 1, precision = 0.1){
-  const l = [a, b];
-
-  return sample(
-    interpolateArc(
-      a,
-      pointTranslate(
-        lineMidpoint(l),
-        lineAngle(l) + 90,
-        lineLength(l) / 2 * offset
-      ),
-      b
-    ),
-    precision
   );
 }
