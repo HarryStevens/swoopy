@@ -38,8 +38,28 @@ export function lineMidpoint(line){
   return [(line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2];
 }
 
+// Rotate a point about an origin by an angle in degrees
+export function pointRotate(point, angle, origin){
+  const r = angleToRadians(angle || 0);
+
+  if (!origin || (origin[0] === 0 && origin[1] === 0)){
+    return rotate(point, r);
+  }
+  else {
+    // See: https://math.stackexchange.com/questions/1964905/rotation-around-non-zero-point
+    const p0 = point.map((c, i) => c - origin[i]);
+    const rotated = rotate(p0, r);
+    return rotated.map((c, i) => c + origin[i]);
+  }
+}
+
 // Translates a point by an angle in degrees and distance.
 export function pointTranslate(point, angle, distance){
   const r = angleToRadians(angle);
   return [point[0] + distance * cos(r), point[1] + distance * sin(r)];
+}
+
+function rotate(point, angle){
+  // See: https://en.wikipedia.org/wiki/Cartesian_coordinate_system#Rotation
+  return [(point[0] * cos(angle)) - point[1] * sin(angle), (point[0] * sin(angle)) + point[1] * cos(angle)];
 }
